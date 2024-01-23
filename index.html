@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vertical Swiper with Smooth Scrolling</title>
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+      overflow: hidden; /* Hide vertical scrollbar */
+      display: flex;
+    }
+
+    .swiper-container {
+      height: 100vh;
+      flex: 1;
+      position: relative;
+    }
+
+    .swiper-slide {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2em;
+      background-color: #f0f0f0;
+      color: #333;
+      opacity: 0; /* Initially hide slides */
+      transition: opacity 1s ease-in-out; /* Adjust the transition duration as needed */
+      position: relative;
+    }
+
+    .swiper-slide.active {
+      opacity: 1; /* Show active slide */
+    }
+
+    .services-overlay {
+      float: left;
+      height: 100%;
+      z-index: 1;
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none; /* Allow clicks to pass through the overlay */
+    }
+
+    .service {
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: color 0.3s ease-in-out;
+      pointer-events: auto; /* Enable clicks on the service links */
+    }
+
+    .service:hover {
+      color: #007BFF; /* Change this color to your preferred hover color */
+    }
+
+    .services-scrollbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 8px;
+      background-color: #eee; /* Set the background color for the scrollbar */
+      opacity: 0; /* Initially hide the scrollbar */
+      transition: opacity 0.5s ease-in-out; /* Add transition for smooth appearance/disappearance */
+      z-index: 2;
+    }
+
+    .services-scrollbar .scroll-indicator {
+      width: 100%;
+      background-color: #007BFF; /* Color of the scroll indicator */
+      transition: height 0.3s ease-in-out; /* Transition for smooth height changes */
+    }
+
+    .services-scrollbar.active {
+      opacity: 1; /* Show the scrollbar when active */
+    }
+  </style>
+</head>
+<body>
+
+  <div class="swiper-container">
+    <div class="swiper-wrapper" style="width: 100vw;">
+      <div class="swiper-slide" data-service="service1">Slide 1</div>
+      <div class="swiper-slide" data-service="service2">Slide 2</div>
+      <div class="swiper-slide" data-service="service3">Slide 3</div>
+      <!-- Add more slides as needed -->
+    </div>
+  </div>
+
+  <div class="services-overlay">
+    <div class="services-scrollbar">
+      <div class="scroll-indicator"></div>
+    </div>
+    <div class="service" onclick="changeService(0)">Service 1</div>
+    <div class="service" onclick="changeService(1)">Service 2</div>
+    <div class="service" onclick="changeService(2)">Service 3</div>
+    <!-- Add more services as needed -->
+  </div>
+
+  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var mySwiper = new Swiper('.swiper-container', {
+        direction: 'vertical',
+        slidesPerView: 1,
+        spaceBetween: 30,
+        mousewheel: true,
+        on: {
+          init: function () {
+            var activeSlide = this.slides[this.activeIndex];
+            activeSlide.classList.add('active');
+            updateActiveService(this.activeIndex);
+          },
+          slideChangeTransitionEnd: function () {
+            var previousSlide = this.slides[this.previousIndex];
+            var activeSlide = this.slides[this.activeIndex];
+
+            previousSlide.classList.remove('active');
+            activeSlide.classList.add('active');
+            updateActiveService(this.activeIndex);
+          }
+        }
+      });
+
+      function updateActiveService(index) {
+        var services = document.querySelectorAll('.services-overlay .service');
+        var servicesScrollbar = document.querySelector('.services-overlay .services-scrollbar .scroll-indicator');
+
+        services.forEach(function (service, i) {
+          service.style.color = i === index ? '#007BFF' : '#333';
+        });
+
+        // Update the services scrollbar indicator height based on the active service
+        var totalServices = services.length;
+        var indicatorHeight = (100 / totalServices) + '%';
+        servicesScrollbar.style.height = indicatorHeight;
+
+        // Show the services scrollbar when active
+        servicesScrollbar.parentElement.parentElement.classList.add('active');
+      }
+
+      window.changeService = function (index) {
+        mySwiper.slideTo(index);
+      };
+    });
+  </script>
+</body>
+</html>
